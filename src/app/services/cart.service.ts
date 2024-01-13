@@ -24,7 +24,7 @@ export class CartService {
     let cartItem = this.cart.items.find((item) => item.food.id === foodId);
     if (!cartItem) return;
     cartItem.quantity = quantity;
-    cartItem.price = quantity * cartItem.food.price;
+    cartItem.price += quantity * cartItem.food.price;
     this.setCartToLocalStorage();
   }
   clearCart() {
@@ -45,11 +45,14 @@ export class CartService {
       0
     );
     const cartJson = JSON.stringify(this.cart);
-    localStorage.setItem('Cart', cartJson);
+    if (typeof window !== 'undefined' && window.document)
+      localStorage.setItem('Cart', cartJson);
     this.cartSubject.next(this.cart);
   }
   private getCartFromLocalStorage(): Cart {
-    const cartJson = localStorage.getItem('Cart');
+    let cartJson;
+    if (typeof window !== 'undefined' && window.document)
+      cartJson = localStorage.getItem('Cart');
     return cartJson ? JSON.parse(cartJson) : new Cart();
   }
   constructor() {}
